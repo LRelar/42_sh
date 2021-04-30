@@ -6,56 +6,142 @@
 #    By: mschimme <marvin@42.fr>                    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2019/03/06 00:16:21 by mschimme          #+#    #+#              #
-#    Updated: 2019/08/28 16:55:30 by mschimme         ###   ########.fr        #
+#    Updated: 2021/04/17 11:18:15 by mschimme         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
-NAME = minishell
+NAME	=	minishell
+CC		=	clang
+FLAGS	=	-Wall -Wextra -g #-Werror
+DIR_LIB	=	./src/libft
 
-.PHONY : all clean fclean re directories
+#**********************				PATHS:			***************************#
+VPATH	:=	./src/corewar/src: \
+			./src/corewar/src/ch_carry: \
+			./src/corewar/src/errors: \
+			./src/corewar/src/exec: \
+			./src/corewar/src/flip_endian: \
+			./src/corewar/src/op: \
+			./src/corewar/src/prep_rout: \
+			./src/corewar/src/print: \
+			./src/corewar/src/serv: \
+			./src/corewar/src/trees: \
+			./src/corewar/src/visualization:
 
-DIR_SRC	= ./src/
-DIR_INC	= ./includes/
-DIR_OBJ	= ./obj/
-LIB		= libft.a
-DIR_LIB	= libft/
+#**********************				src:			***************************#
+SOURCE	+=	corewar.c
+#**********************			src/ch_carry:		***************************#
+SOURCE	+=	create_carry.c \
+			init_carries.c \
+			insert_carry.c
+#**********************			src/errors:			***************************#
+SOURCE	+=	err_champ.c \
+			err_champ_content.c \
+			err_champ_content_2.c \
+			err_champ_mgr.c \
+			err_comp_params.c \
+			err_f_n.c \
+			err_fdump.c \
+			err_fg_fd_together.c \
+			err_gen.c
+#**********************			src/exec:			***************************#
+SOURCE	+=	exec_lobby.c \
+			get_operands.c \
+			operands_head_get.c \
+			operands_head_get_comp.c \
+			operands_head_set.c \
+			the_cycle.c
+#**********************		src/flip_endian:		***************************#
+SOURCE	+=	end_01_conv_1_4.c \
+			end_02_conv_5-8.c
+#**********************				src/op:			***************************#
+SOURCE	+=	arena_get.c \
+			op_00_new_op.c \
+			op_01_live.c \
+			op_02_ld.c \
+			op_03_st.c \
+			op_04_add.c \
+			op_05_sub.c \
+			op_06_and.c \
+			op_07_or.c \
+			op_08_xor.c \
+			op_09_zjmp.c \
+			op_10_ldi.c \
+			op_11_sti.c \
+			op_12_fork.c \
+			op_13_lld.c \
+			op_14_lldi.c \
+			op_15_lfork.c \
+			op_16_aff.c \
+			op_cont.c
+#**********************			src/prep_rout:		***************************#
+SOURCE	+=	check_id.c \
+			check_input.c \
+			manage_champ.c \
+			parse_champ.c \
+			parse_fdump.c \
+			parse_n_flag.c \
+			prep_battle.c \
+			read_champ_file.c \
+			read_params.c \
+			resolve_modes.c
+#**********************			src/print:			***************************#
+SOURCE	+=	print_dump_lobby.c \
+			print_outro.c
+#**********************			src/serv:			***************************#
+SOURCE	+=	_del_carry.c \
+			_del_error.c \
+			add_cyclist.c \
+			cyc_cycsol_cmp.c \
+			interact_user.c \
+			is_digits.c \
+			manage_world.c \
+			proxies.c \
+			sort_champs.c
+#**********************			src/trees:			***************************#
+SOURCE	+=	dvasa_add.c \
+			dvasa_create.c \
+			dvasa_delete.c \
+			dvasa_pick.c \
+			manage_tree.c
+#**********************		src/visualization:		***************************#
+SOURCE	+=	init_visual.c \
+			manage_carry.c \
+			manage_colors.c \
+			print_helpers.c \
+			manage_attributes.c \
+			cycle_helpers.c \
+			cycle_visual.c
 
-SOURCE	= built-in_prompt.c \
-deb_funcs.c \
-errors.c \
-init_structs.c \
-process_control.c \
-process_input.c \
-read.c \
-shell.c \
-termios.c
+OBJ_DIR		:=	./obj_$(NAME)
+OBJECTS		:=	$(patsubst %,$(OBJ_DIR)/%,$(SOURCE:.c=.o))
 
+INC_DIR	:=	./src/corewar/includes $(DIR_LIB)/includes ./includes
+IFLAGS	+=	$(foreach d, $(INC_DIR), -I$d)
 
-FLAGS	= -Wall -Wextra #-Werror
-
-OBJ		= $(SOURCE:%.c=%.o)
-OBJS	= $(SOURCE:%.c=$(DIR_OBJ)%.o)
-SRCS	= $(SOURCE:%.c=$(DIR_SRC)%.c)
+.PHONY: all clean fclean re MAKEDIR LIB
 
 all: $(NAME)
 
-$(NAME): $(LIB) directories $(OBJS)
-	@gcc $(FLAGS) -o $(NAME) $(OBJS) -L$(DIR_LIB) -lft
+$(NAME): LIB MAKEDIR $(OBJECTS)
+	@$(CC) $(FLAGS) $(OBJECTS) -L $(DIR_LIB) -lft -lncurses -o $(NAME)
 
-directories:
-	@mkdir -p $(DIR_OBJ)
-
-$(LIB):
+LIB:
 	@$(MAKE) -C $(DIR_LIB)
 
-$(DIR_OBJ)%.o: $(DIR_SRC)%.c
-	@gcc $(FLAGS) -o $@ -c $< -I$(DIR_PAR)$(DIR_LIB)$(DIR_INC) -I$(DIR_PAR)$(DIR_INC)
+MAKEDIR:
+	@mkdir -p $(OBJ_DIR)
+
+$(OBJ_DIR)/%.o:%.c
+	@$(CC) $(FLAGS) $(IFLAGS) -o $@ -c $<
 
 clean:
-	@rm -f $(DIR_OBJ)*.o
-	@rm -f $(DIR_LIB)*.o
-	@rm -rf $(DIR_OBJ)
+	@rm -rf $(OBJ_DIR)
+	@$(MAKE) -C $(DIR_LIB) clean
+	
+
 fclean: clean
-	@rm -f $(DIR_LIB)$(LIB)
-	@rm -f $(NAME)
+	@rm -rf $(NAME)
+	@$(MAKE) -C $(DIR_LIB) fclean
+
 re: fclean all
