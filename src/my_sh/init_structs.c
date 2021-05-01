@@ -6,7 +6,7 @@
 /*   By: mschimme <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/08/25 19:47:51 by mschimme          #+#    #+#             */
-/*   Updated: 2019/09/13 13:50:55 by mschimme         ###   ########.fr       */
+/*   Updated: 2021/05/01 13:48:12 by mschimme         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,7 +41,7 @@ inline static	uint8_t	ft_get_pc_name(t_prompt *prompt)
 		return (ERR_KERN);
 	if (!(prompt->hostname = (char *)malloc((buffsize + 7) * sizeof(char))))
 		return (ERR_MALLOC);
-	ft_memcpy((void *)prompt->hostname, (CV *)"🖥 : ", 7);
+	ft_memcpy((void *)prompt->hostname, (const void *)"🖥 : ", 7);
 	ft_memcpy((void *)prompt->hostname + 7, buff, buffsize);
 	free(buff);
 	return (FT_NOERR);
@@ -58,9 +58,9 @@ inline static uint8_t	ft_init_prompt(t_prompt *prompt)
 	if ((path = getcwd(path, 0)))
 	{
 		errflag = FT_NOERR;
-		ft_memcpy((void *)prompt->foldsym, (CV *)" 📂: ", 8);
-		ft_memcpy((void *)prompt->ending, (CV *)" $> ", 5);
-		ft_memcpy((void *)prompt->subpr, (CV *)" > ", 4);
+		ft_memcpy((void *)prompt->foldsym, (const void *)" 📂: ", 8);
+		ft_memcpy((void *)prompt->ending, (const void *)" $> ", 5);
+		ft_memcpy((void *)prompt->subpr, (const void *)" > ", 4);
 		ptr = ft_strrchr(path, '/');
 		if (!(prompt->curdname = ft_strdup(ft_strlen(ptr) == 1 ? ptr : ptr + 1)))
 			errflag = ERR_MALLOC;
